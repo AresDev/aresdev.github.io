@@ -124,12 +124,12 @@ google_analytics: 'UA-137699401-1'
 # --- Comments --- #
 
 # Fill in your Disqus shortname (NOT the userid) if you want to support Disqus comments
-# disqus: ""
+disqus: 'aresdev'
 # If you want to use just-comments fill with the API Key
 #just-comments: "ABCD-EFGH-IJKL"
 
 # To use Facebook Comments, fill in a Facebook App ID
-fb_comment_id: '680915419093800'
+# fb_comment_id: '680915419093800'
 
 # Staticman support
 staticman:
