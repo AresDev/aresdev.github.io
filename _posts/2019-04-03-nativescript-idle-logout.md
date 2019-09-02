@@ -110,62 +110,85 @@ The code result for this step by step can be found in this [repo](https://github
      AndroidActivityCallbacks,
      setActivityCallbacks
    } from 'tns-core-modules/ui/frame/frame';
+
+   @JavaProxy('com.tns.NativeScriptActivity')
+   class Activity extends android.support.v7.app.AppCompatActivity {
+     private _callbacks: AndroidActivityCallbacks;
+
+     public onUserInteraction(): void {
+       ANDROID_USER_ACTIVITY_EVENTS.next(null);
+       console.log('user interaction');
+     }
+
+     public onCreate(savedInstanceState: any): void {
+       if (!this._callbacks) {
+         setActivityCallbacks(this);
+       }
+
+       this._callbacks.onCreate(this, savedInstanceState, super.onCreate);
+     }
+
+     public onSaveInstanceState(outState: any): void {
+       this._callbacks.onSaveInstanceState(
+         this,
+         outState,
+         super.onSaveInstanceState
+       );
+     }
+
+     public onPause(): void {
+       this._callbacks.onStart(this, super.onPause);
+     }
+
+     public onStart(): void {
+       this._callbacks.onStart(this, super.onStart);
+     }
+
+     public onStop(): void {
+       this._callbacks.onStop(this, super.onStop);
+     }
+
+     public onDestroy(): void {
+       this._callbacks.onDestroy(this, super.onDestroy);
+     }
+
+     public onBackPressed(): void {
+       this._callbacks.onBackPressed(this, super.onBackPressed);
+     }
+
+     public onRequestPermissionsResult(
+       requestCode: number,
+       permissions: Array<string>,
+       grantResults: Array<number>
+     ): void {
+       this._callbacks.onRequestPermissionsResult(
+         this,
+         requestCode,
+         permissions,
+         grantResults,
+         undefined /*TODO: Enable if needed*/
+       );
+     }
+
+     public onActivityResult(
+       requestCode: number,
+       resultCode: number,
+       data: any
+     ): void {
+       this._callbacks.onActivityResult(
+         this,
+         requestCode,
+         resultCode,
+         data,
+         super.onActivityResult
+       );
+     }
+   }
    ```
 
+   You have to make sure that the qualified name of the activity inside @JavaProxy annotation matches the name for the main activity in AndroidManifest.xml
 
-    @JavaProxy('com.tns.NativeScriptActivity')
-    class Activity extends android.support.v7.app.AppCompatActivity {
-        private _callbacks: AndroidActivityCallbacks;
-
-        public onUserInteraction(): void {
-            ANDROID_USER_ACTIVITY_EVENTS.next(null);
-            console.log('user interaction');
-        }
-
-        public onCreate(savedInstanceState: any): void {
-            if (!this._callbacks) {
-                setActivityCallbacks(this);
-            }
-
-            this._callbacks.onCreate(this, savedInstanceState, super.onCreate);
-        }
-
-        public onSaveInstanceState(outState: any): void {
-            this._callbacks.onSaveInstanceState(this, outState, super.onSaveInstanceState);
-        }
-
-        public onPause(): void {
-            this._callbacks.onStart(this, super.onPause);
-        }
-
-        public onStart(): void {
-            this._callbacks.onStart(this, super.onStart);
-        }
-
-        public onStop(): void {
-            this._callbacks.onStop(this, super.onStop);
-        }
-
-        public onDestroy(): void {
-            this._callbacks.onDestroy(this, super.onDestroy);
-        }
-
-        public onBackPressed(): void {
-            this._callbacks.onBackPressed(this, super.onBackPressed);
-        }
-
-        public onRequestPermissionsResult(requestCode: number, permissions: Array<string>, grantResults: Array<number>): void {
-            this._callbacks.onRequestPermissionsResult(this, requestCode, permissions, grantResults, undefined /*TODO: Enable if needed*/);
-        }
-
-        public onActivityResult(requestCode: number, resultCode: number, data: any): void {
-            this._callbacks.onActivityResult(this, requestCode, resultCode, data, super.onActivityResult);
-        }
-    }
-    ```
-    You have to make sure that the qualified name of the activity inside @JavaProxy annotation matches the name for the main activity in AndroidManifest.xml
-
-    For the purpose of this written we only need to override the method onUserInteraction but the rest of the methods are shown for you to see the possibilities
+   For the purpose of this written we only need to override the method onUserInteraction but the rest of the methods are shown for you to see the possibilities
 
 10. Modify your app.component.ts file again to add the subject emitter, it should look like this:
 
@@ -253,10 +276,10 @@ The code result for this step by step can be found in this [repo](https://github
     }
     ```
 
-12. Inject the TimeoutService and Init/Start the timer when ever you need(when user reaches dashboard after successful login).
+12. Inject the TimeoutService and Init/Start the timer when ever you need(when user reaches dashboard after succesful login).
 
 
-    In this case I didn't when reaching ItemsDetailComponent in Angular default starter template
+    In this case I did't when reaching ItemsDetailComponent in Angular default starter template
 
     ```typescript
     import { Component, OnInit } from "@angular/core";
